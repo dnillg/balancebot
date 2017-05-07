@@ -16,7 +16,17 @@ void setup()
 void loop()
 {
 	Orientation orientation = orientationProvider->getOrientation();
+	Serial.write("Pitch: ");
 	Serial.print(orientation.pitch);
+	Serial.write("    ");
+
+	Serial.write("Roll: ");
+	Serial.print(orientation.roll);
+	Serial.write("    ");
+
+	Serial.write("Yaw: ");
+	Serial.print(orientation.yaw);
+	Serial.write("    ");
 	Serial.write("\n");
-	delay(2000);
+	delay(10);
 }
