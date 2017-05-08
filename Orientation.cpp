@@ -1,10 +1,3 @@
-/*
- * Orientation.cpp
- *
- *  Created on: 2017. máj. 7.
- *      Author: Reactorx2
- */
-
 #include "Orientation.h"
 
 Orientation::Orientation() {
@@ -13,9 +6,19 @@ Orientation::Orientation() {
 	this->roll = 0;
 }
 
-Orientation::Orientation(uint16_t pitch, uint16_t yawn, uint16_t roll) {
-	this->pitch = pitch;
-	this->yaw = yawn;
-	this->roll = roll;
+int16_t Orientation::getSignedPitch() const {
+	if(pitch <= INT16_MAX) {
+		return (int16_t) pitch;
+	} else {
+		return (int16_t) - (UINT16_MAX - pitch);
+	}
+}
+
+int16_t Orientation::getSignedRoll() const {
+	if(roll <= INT16_MAX) {
+		return (int16_t) roll;
+	} else {
+		return (int16_t) - (UINT16_MAX - roll);
+	}
 }
 

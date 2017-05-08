@@ -1,12 +1,15 @@
 #include "Arduino.h"
 
 #include "BalanceBotPins.h"
+#include "MotorHandler.h"
 #include "OrientationHandler.h"
 #include "EncoderHandler.h"
+#include "BalanceControl.h"
 
+MotorHandler* motorHandler;
 OrientationHandler* orientationHandler;
 EncoderHandler* encoderHandler;
-int count = 0;
+BalanceControl* balanceControl;
 
 void setup() {
 	//Pins
@@ -25,42 +28,30 @@ void setup() {
 	attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_RIGHT_A),
 			updateRightWheel, CHANGE);
 	attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_LEFT_A), updateLeftWheel,
-			CHANGE);
+	CHANGE);
 
 	//Serial
 	Serial.begin(9600);
 	while (!Serial)
 		;
 
-	//Handlers
+	motorHandler = new MotorHandler(1);
 	orientationHandler = new OrientationHandler();
 	encoderHandler = new EncoderHandler();
-
+	balanceControl = new BalanceControl(orientationHandler, encoderHandler);
 
 	//motorTest();
 }
 
 void loop() {
-	Orientation orientation = orientationHandler->getOrientation();
-	Serial.write("Pitch: ");
-	Serial.print(orientation.pitch);
-	Serial.write("    ");
-
-	Serial.write("Roll: ");
-	Serial.print(orientation.roll);
-	Serial.write("    ");
-
-	Serial.write("Yaw: ");
-	Serial.print(orientation.yaw);
-	Serial.write("    ");
-
-	Serial.write("Dist: ");
-	Serial.print(encoderHandler->getDistance());
-	Serial.write("    ");
-
-	Serial.write("\n");
-	delay(200);
-
+	ControlOutput output = balanceControl->getControlValue();
+	if (millis() < 15000) {
+		motorHandler->setLeftSpeed(output.left);
+		motorHandler->setRightSpeed(output.right);
+	} else {
+		motorHandler->setLeftSpeed(0);
+		motorHandler->setRightSpeed(0);
+	}
 }
 
 void updateLeftWheel() {
@@ -72,10 +63,6 @@ void updateRightWheel() {
 	encoderHandler->updateRightWheel(digitalRead(PIN_ENCODER_RIGHT_A),
 			digitalRead(PIN_ENCODER_RIGHT_B));
 }
-
-
-
-
 
 void motorTest() {
 	digitalWrite(PIN_HB_LEFT_FORWARD, LOW);
