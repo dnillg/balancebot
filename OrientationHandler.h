@@ -1,14 +1,13 @@
-#ifndef ORIENTATIONPROVIDER_H_
-#define ORIENTATIONPROVIDER_H_
+#ifndef ORIENTATIONHANDLER_H_
+#define ORIENTATIONHANDLER_H_
 
 #include <Wire.h>
 #include "Arduino.h"
 
 #include "Orientation.h"
 
-class OrientationProvider {
-
-	public:
+class OrientationHandler {
+private:
     typedef enum
     {
       /* Page id register definition */
@@ -157,14 +156,14 @@ class OrientationProvider {
       ACCEL_RADIUS_MSB_ADDR                                   = 0X68,
       MAG_RADIUS_LSB_ADDR                                     = 0X69,
       MAG_RADIUS_MSB_ADDR                                     = 0X6A
-    } adafruit_bno055_reg_t;
+    } bno055_reg_t;
 
     typedef enum
     {
       POWER_MODE_NORMAL                                       = 0X00,
       POWER_MODE_LOWPOWER                                     = 0X01,
       POWER_MODE_SUSPEND                                      = 0X02
-    } adafruit_bno055_powermode_t;
+    } bno055_powermode_t;
 
     typedef enum
     {
@@ -182,7 +181,7 @@ class OrientationProvider {
       OPERATION_MODE_M4G                                      = 0X0A,
       OPERATION_MODE_NDOF_FMC_OFF                             = 0X0B,
       OPERATION_MODE_NDOF                                     = 0X0C
-    } adafruit_bno055_opmode_t;
+    } bno055_opmode_t;
 
     typedef enum
     {
@@ -194,7 +193,7 @@ class OrientationProvider {
       REMAP_CONFIG_P5                                         = 0x21,
       REMAP_CONFIG_P6                                         = 0x21,
       REMAP_CONFIG_P7                                         = 0x24
-    } adafruit_bno055_axis_remap_config_t;
+    } bno055_axis_remap_config_t;
 
     typedef enum
     {
@@ -206,7 +205,7 @@ class OrientationProvider {
       REMAP_SIGN_P5                                           = 0x01,
       REMAP_SIGN_P6                                           = 0x07,
       REMAP_SIGN_P7                                           = 0x05
-    } adafruit_bno055_axis_remap_sign_t;
+    } bno055_axis_remap_sign_t;
 
     typedef struct
     {
@@ -215,7 +214,7 @@ class OrientationProvider {
       uint8_t  gyro_rev;
       uint16_t sw_rev;
       uint8_t  bl_rev;
-    } adafruit_bno055_rev_info_t;
+    } bno055_rev_info_t;
 
     typedef enum
     {
@@ -225,26 +224,17 @@ class OrientationProvider {
       VECTOR_EULER         = BNO055_EULER_H_LSB_ADDR,
       VECTOR_LINEARACCEL   = BNO055_LINEAR_ACCEL_DATA_X_LSB_ADDR,
       VECTOR_GRAVITY       = BNO055_GRAVITY_DATA_X_LSB_ADDR
-    } adafruit_vector_type_t;
+    } vector_type_t;
 
 	const uint8_t I2C_ADDR = 0x29;
 
-	//Registers
-	const uint8_t PITCH_MSB = 0x1F;
-	const uint8_t PITCH_LSB = 0x1E;
-	const uint8_t ROLL_MSB = 0x1D;
-	const uint8_t ROLL_LSB = 0x1C;
-	const uint8_t YAW_LSB = 0x1B;
-	const uint8_t YAW_MSB = 0x1A;
-
-	uint8_t readRegister(uint8_t regNum);
-
 public:
-	OrientationProvider();
+	OrientationHandler();
 	Orientation getOrientation();
 
 private:
-	void write8(uint8_t key, uint8_t value);
+	uint8_t readRegister(uint8_t regAddr);
+	void writeRegister(uint8_t key, uint8_t value);
 };
 
 #endif
