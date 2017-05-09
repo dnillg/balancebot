@@ -12,21 +12,21 @@ BalanceControl::BalanceControl(OrientationHandler* orientationHandler,
 	this->orientationHandler = orientationHandler;
 	this->encoderHandler = encoderHandler;
 	this->tiltPid = new PID(&tiltPidInput, &tiltPidOutput, &tiltPidSetPoint,
-			TILT_PID_P, TILT_PID_I, TILT_PID_D, REVERSE);
+			TILT_PID_P, TILT_PID_I, TILT_PID_D, DIRECT);
 	tiltPid->SetMode(AUTOMATIC);
 	tiltPid->SetOutputLimits(-255, 255);
 }
 
 ControlOutput BalanceControl::getControlValue() {
 	Orientation orientation = orientationHandler->getOrientation();
-	Serial.write("Roll: ");
-	Serial.print(orientation.getSignedRoll());
-	Serial.write("    ");
+//	Serial.write("Roll: ");
+//	Serial.print(orientation.getSignedRoll());
+//	Serial.write("    ");
 	tiltPidInput = orientation.getSignedRoll();
 	tiltPid->Compute();
-	Serial.write("OUTPUT: ");
-	Serial.print(tiltPidOutput);
-	Serial.write("\n");
-	return ControlOutput(tiltPidOutput, tiltPidOutput);
+//	Serial.write("OUTPUT: ");
+//	Serial.print(tiltPidOutput);
+//	Serial.write("\n");
+	return ControlOutput(-tiltPidOutput, -tiltPidOutput);
 }
 

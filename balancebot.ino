@@ -25,32 +25,48 @@ void setup() {
 	pinMode(PIN_HB_RIGHT_FORWARD, OUTPUT);
 
 	//Interrupts
-	attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_RIGHT_A),
-			updateRightWheel, CHANGE);
-	attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_LEFT_A), updateLeftWheel,
-	CHANGE);
+	//attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_RIGHT_A),
+	//		updateRightWheel, CHANGE);
+	//attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_LEFT_A), updateLeftWheel,
+	//CHANGE);
 
 	//Serial
 	Serial.begin(9600);
-	while (!Serial)
-		;
+	while (!Serial);
 
-	motorHandler = new MotorHandler(1);
+	motorHandler = new MotorHandler(50, 3, 0);
 	orientationHandler = new OrientationHandler();
 	encoderHandler = new EncoderHandler();
 	balanceControl = new BalanceControl(orientationHandler, encoderHandler);
 
-	//motorTest();
 }
+
+void printDistance() {
+	Serial.write("LEFT: ");
+	Serial.print(encoderHandler->getLeftDistance());
+	Serial.write("    ");
+	Serial.write("RIGHT: ");
+	Serial.print(encoderHandler->getRightDistance());
+	Serial.write("\n");
+}
+
+long i = 0;
 
 void loop() {
 	ControlOutput output = balanceControl->getControlValue();
-	if (millis() < 15000) {
+	//delay(100);
+	if (millis() < 32000) {
 		motorHandler->setLeftSpeed(output.left);
 		motorHandler->setRightSpeed(output.right);
 	} else {
 		motorHandler->setLeftSpeed(0);
 		motorHandler->setRightSpeed(0);
+	}
+	//delay(7);
+	i++;
+	if(i%100 == 0) {
+//		Serial.print(millis());
+//		Serial.write("\n");
 	}
 }
 
@@ -65,20 +81,19 @@ void updateRightWheel() {
 }
 
 void motorTest() {
-	digitalWrite(PIN_HB_LEFT_FORWARD, LOW);
-	digitalWrite(PIN_HB_LEFT_BACKWARD, LOW);
-	digitalWrite(PIN_HB_RIGHT_BACKWARD, LOW);
-	digitalWrite(PIN_HB_RIGHT_FORWARD, LOW);
-	digitalWrite(PIN_HB_LEFT_ENABLE, LOW);
-	digitalWrite(PIN_HB_RIGHT_ENABLE, LOW);
-
-	digitalWrite(PIN_HB_LEFT_FORWARD, HIGH);
-	analogWrite(PIN_HB_LEFT_ENABLE, 125);
-	delay(500);
-	digitalWrite(PIN_HB_LEFT_FORWARD, LOW);
-
-	analogWrite(PIN_HB_RIGHT_ENABLE, 125);
-	digitalWrite(PIN_HB_RIGHT_FORWARD, HIGH);
-	delay(500);
-	digitalWrite(PIN_HB_RIGHT_FORWARD, LOW);
+	for (int offset = 0; offset < 16; offset+=3) {
+			Serial.write("OFFSET: ");
+			Serial.print(offset);
+			Serial.write("\n");
+			for (int i = 0; i < 5; i++) {
+				motorHandler->setLeftSpeed(50 + i*20 + offset);
+				motorHandler->setRightSpeed(50 + i*20 );
+				delay(2000);
+				motorHandler->setLeftSpeed(0);
+				motorHandler->setRightSpeed(0);
+				delay(1000);
+				printDistance();
+				encoderHandler->reset();
+			}
+		}
 }
