@@ -7,15 +7,10 @@
 
 #include "MotorHandler.h"
 
-MotorHandler::MotorHandler(uint8_t threshold) {
-	resetPins();
-	this->threshold = threshold;
-	this->rangeMultiplier = (UINT8_MAX - threshold) / (double) UINT8_MAX;
-}
-
 MotorHandler::MotorHandler(uint8_t threshold, uint8_t offsetLeft,
 		uint8_t offsetRight) {
 	resetPins();
+	this->enabled = true;
 	this->threshold = threshold;
 	this->rangeMultiplier = (UINT8_MAX - threshold) / (double) UINT8_MAX;
 	this->offsetLeft = offsetLeft;
@@ -49,6 +44,10 @@ void MotorHandler::setRightSpeed(int16_t speed) {
 
 void MotorHandler::setSpeed(int16_t speed, uint8_t enablePin,
 		uint8_t forwardPin, uint8_t backwardPin) {
+	if(!enabled) {
+		speed = 0;
+	}
+
 	if (speed > UINT8_MAX) {
 		speed = UINT8_MAX;
 	} else if (speed < -UINT8_MAX) {
@@ -71,3 +70,10 @@ void MotorHandler::setSpeed(int16_t speed, uint8_t enablePin,
 	}
 }
 
+void MotorHandler::setEnabled(bool enabled) {
+	this->enabled = enabled;
+	if(!enabled) {
+		setLeftSpeed(0);
+		setRightSpeed(0);
+	}
+}

@@ -25,20 +25,22 @@ void setup() {
 	pinMode(PIN_HB_RIGHT_FORWARD, OUTPUT);
 
 	//Interrupts
-	//attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_RIGHT_A),
-	//		updateRightWheel, CHANGE);
-	//attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_LEFT_A), updateLeftWheel,
-	//CHANGE);
+	attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_RIGHT_A),
+			updateRightWheel, CHANGE);
+	attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_LEFT_A), updateLeftWheel,
+	CHANGE);
 
 	//Serial
 	Serial.begin(9600);
-	while (!Serial);
+	while (!Serial)
+		;
 
-	motorHandler = new MotorHandler(50, 3, 0);
+	motorHandler = new MotorHandler(52, 4, 0);
 	orientationHandler = new OrientationHandler();
 	encoderHandler = new EncoderHandler();
 	balanceControl = new BalanceControl(orientationHandler, encoderHandler);
 
+	//motorTest();
 }
 
 void printDistance() {
@@ -50,24 +52,19 @@ void printDistance() {
 	Serial.write("\n");
 }
 
-long i = 0;
+long loopNumber = 0;
 
 void loop() {
+
 	ControlOutput output = balanceControl->getControlValue();
-	//delay(100);
-	if (millis() < 32000) {
-		motorHandler->setLeftSpeed(output.left);
-		motorHandler->setRightSpeed(output.right);
-	} else {
-		motorHandler->setLeftSpeed(0);
-		motorHandler->setRightSpeed(0);
+	motorHandler->setLeftSpeed(output.left);
+	motorHandler->setRightSpeed(output.right);
+
+	if (millis() > 32000) {
+		motorHandler->setEnabled(0);
 	}
-	//delay(7);
-	i++;
-	if(i%100 == 0) {
-//		Serial.print(millis());
-//		Serial.write("\n");
-	}
+
+	loopNumber++;
 }
 
 void updateLeftWheel() {
@@ -81,19 +78,19 @@ void updateRightWheel() {
 }
 
 void motorTest() {
-	for (int offset = 0; offset < 16; offset+=3) {
-			Serial.write("OFFSET: ");
-			Serial.print(offset);
-			Serial.write("\n");
-			for (int i = 0; i < 5; i++) {
-				motorHandler->setLeftSpeed(50 + i*20 + offset);
-				motorHandler->setRightSpeed(50 + i*20 );
-				delay(2000);
-				motorHandler->setLeftSpeed(0);
-				motorHandler->setRightSpeed(0);
-				delay(1000);
-				printDistance();
-				encoderHandler->reset();
-			}
+	for (int offset = 0; offset < 1; offset += 3) {
+		Serial.write("OFFSET: ");
+		Serial.print(offset);
+		Serial.write("\n");
+		for (int i = 0; i < 10; i++) {
+			motorHandler->setLeftSpeed(45 + i * 10);
+			motorHandler->setRightSpeed(45 + i * 10);
+			delay(3000);
+			motorHandler->setLeftSpeed(0);
+			motorHandler->setRightSpeed(0);
+			delay(500);
+			printDistance();
+			encoderHandler->reset();
 		}
+	}
 }

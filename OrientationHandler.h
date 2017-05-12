@@ -228,13 +228,16 @@ private:
 
 	const uint8_t I2C_ADDR = 0x29;
 
+	const uint8_t calibrationData[23] = {0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE0, 0x01};
+
 public:
 	OrientationHandler();
 	Orientation getOrientation();
-
+	void printCalibrationData();
 private:
 	uint8_t readRegister(uint8_t regAddr);
 	void writeRegister(uint8_t key, uint8_t value);
+	void writeCalibrationData();
 };
 
 #endif

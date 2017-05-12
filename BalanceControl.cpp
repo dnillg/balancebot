@@ -19,14 +19,13 @@ BalanceControl::BalanceControl(OrientationHandler* orientationHandler,
 
 ControlOutput BalanceControl::getControlValue() {
 	Orientation orientation = orientationHandler->getOrientation();
-//	Serial.write("Roll: ");
-//	Serial.print(orientation.getSignedRoll());
-//	Serial.write("    ");
-	tiltPidInput = orientation.getSignedRoll();
+	tiltPidInput = orientation.roll;
 	tiltPid->Compute();
-//	Serial.write("OUTPUT: ");
-//	Serial.print(tiltPidOutput);
-//	Serial.write("\n");
 	return ControlOutput(-tiltPidOutput, -tiltPidOutput);
+}
+
+void BalanceControl::resetPid(double p, double i, double d) {
+	this->tiltPid = new PID(&tiltPidInput, &tiltPidOutput, &tiltPidSetPoint,
+			p, i, d, DIRECT);
 }
 
