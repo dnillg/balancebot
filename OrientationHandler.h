@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include "Arduino.h"
 
+#include "Configuration.h"
 #include "Orientation.h"
 
 class OrientationHandler {
@@ -226,7 +227,8 @@ private:
       VECTOR_GRAVITY       = BNO055_GRAVITY_DATA_X_LSB_ADDR
     } vector_type_t;
 
-	const uint8_t I2C_ADDR = 0x29;
+	static const uint8_t I2C_ADDR;
+	static const double RAW_TO_DEGREE;
 
 	const uint8_t calibrationData[23] = {0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE0, 0x01};
 
@@ -238,6 +240,7 @@ private:
 	uint8_t readRegister(uint8_t regAddr);
 	void writeRegister(uint8_t key, uint8_t value);
 	void writeCalibrationData();
+	static double toDegree(uint8_t raw);
 };
 
 #endif

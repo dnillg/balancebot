@@ -1,18 +1,39 @@
+#define SERIAL_RX_BUFFER_SIZE 96
+#define SERIAL_TX_BUFFER_SIZE 96
+
 #include "Arduino.h"
 
-#include "BalanceBotPins.h"
+#include "Configuration.h"
 #include "MotorHandler.h"
 #include "OrientationHandler.h"
 #include "EncoderHandler.h"
 #include "BalanceControl.h"
+#include "DiagnosticsMethods.h"
+#include "FrequencyRegulator.h"
+#include "DisplayHandler.h"
+#include "JobScheduler.h"
+#include "SerialCommandParser.h"
 
-MotorHandler* motorHandler;
-OrientationHandler* orientationHandler;
-EncoderHandler* encoderHandler;
-BalanceControl* balanceControl;
+typedef struct {
+	MotorHandler* motorHandler;
+	OrientationHandler* orientationHandler;
+	EncoderHandler* encoderHandler;
+	BalanceControl* balanceControl;
+	FrequencyRegulator* frequencyRegulator;
+	JobScheduler* jobScheduler;
+	DisplayHandler* displayHandler;
+	SerialCommandParser* commandParser;
+} Context;
+
+Context context;
+
+void updateLeftWheel();
+void updateRightWheel();
+void printEffectiveFrequency();
+void printEffectiveFrequencyLcd();
+void printStatusCharLcd();
 
 void setup() {
-	//Pins
 	pinMode(PIN_ENCODER_LEFT_A, INPUT);
 	pinMode(PIN_ENCODER_LEFT_A, INPUT);
 	pinMode(PIN_ENCODER_RIGHT_A, INPUT_PULLUP);
@@ -24,73 +45,72 @@ void setup() {
 	pinMode(PIN_HB_RIGHT_BACKWARD, OUTPUT);
 	pinMode(PIN_HB_RIGHT_FORWARD, OUTPUT);
 
-	//Interrupts
 	attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_RIGHT_A),
 			updateRightWheel, CHANGE);
 	attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_LEFT_A), updateLeftWheel,
 	CHANGE);
 
-	//Serial
-	Serial.begin(9600);
+	Serial.begin(38400);
 	while (!Serial)
 		;
 
-	motorHandler = new MotorHandler(52, 4, 0);
-	orientationHandler = new OrientationHandler();
-	encoderHandler = new EncoderHandler();
-	balanceControl = new BalanceControl(orientationHandler, encoderHandler);
+	context.motorHandler = new MotorHandler(MOTOR_MIN, MOTOR_LEFT_OFFSET,
+	MOTOR_RIGHT_OFFSET);
+	context.orientationHandler = new OrientationHandler();
+	context.encoderHandler = new EncoderHandler();
+	context.balanceControl = new BalanceControl(context.orientationHandler,
+			context.encoderHandler);
+	context.frequencyRegulator = new FrequencyRegulator(100);
+	context.displayHandler = new DisplayHandler(context.balanceControl,
+			context.frequencyRegulator);
+	context.jobScheduler = new JobScheduler();
+	context.commandParser = new SerialCommandParser(context.balanceControl, context.motorHandler, context.displayHandler);
 
-	//motorTest();
+	context.jobScheduler->addJob(100, printEffectiveFrequency);
+	context.jobScheduler->addJob(500, printEffectiveFrequencyLcd);
+	context.jobScheduler->addJob(100, printStatusCharLcd);
+
+	context.displayHandler->printParams(context.balanceControl->getP(),
+			context.balanceControl->getI(), context.balanceControl->getD());
 }
 
-void printDistance() {
-	Serial.write("LEFT: ");
-	Serial.print(encoderHandler->getLeftDistance());
-	Serial.write("    ");
-	Serial.write("RIGHT: ");
-	Serial.print(encoderHandler->getRightDistance());
-	Serial.write("\n");
-}
-
-long loopNumber = 0;
+unsigned long loops = 0;
 
 void loop() {
+	context.commandParser->handleCommands();
+	context.frequencyRegulator->waitTick();
+	context.jobScheduler->tick();
+	ControlOutput output = context.balanceControl->getControlValue();
+	context.motorHandler->setLeftSpeed(output.left);
+	context.motorHandler->setRightSpeed(output.right);
 
-	ControlOutput output = balanceControl->getControlValue();
-	motorHandler->setLeftSpeed(output.left);
-	motorHandler->setRightSpeed(output.right);
-
-	if (millis() > 32000) {
-		motorHandler->setEnabled(0);
+	if (millis() > 2000000) {
+		context.motorHandler->setEnabled(0);
 	}
 
-	loopNumber++;
+	Serial.flush();
+	loops++;
 }
 
 void updateLeftWheel() {
-	encoderHandler->updateLeftWheel(digitalRead(PIN_ENCODER_LEFT_A),
+	context.encoderHandler->updateLeftWheel(digitalRead(PIN_ENCODER_LEFT_A),
 			digitalRead(PIN_ENCODER_LEFT_B));
 }
 
 void updateRightWheel() {
-	encoderHandler->updateRightWheel(digitalRead(PIN_ENCODER_RIGHT_A),
+	context.encoderHandler->updateRightWheel(digitalRead(PIN_ENCODER_RIGHT_A),
 			digitalRead(PIN_ENCODER_RIGHT_B));
 }
 
-void motorTest() {
-	for (int offset = 0; offset < 1; offset += 3) {
-		Serial.write("OFFSET: ");
-		Serial.print(offset);
-		Serial.write("\n");
-		for (int i = 0; i < 10; i++) {
-			motorHandler->setLeftSpeed(45 + i * 10);
-			motorHandler->setRightSpeed(45 + i * 10);
-			delay(3000);
-			motorHandler->setLeftSpeed(0);
-			motorHandler->setRightSpeed(0);
-			delay(500);
-			printDistance();
-			encoderHandler->reset();
-		}
-	}
+void printEffectiveFrequency() {
+	context.frequencyRegulator->printEffectiveFrequency();
+}
+
+void printEffectiveFrequencyLcd() {
+	context.displayHandler->printFrequency(
+			context.frequencyRegulator->getEffectiveFrequency());
+}
+
+void printStatusCharLcd() {
+	context.displayHandler->printStatusChar();
 }

@@ -77,3 +77,7 @@ void MotorHandler::setEnabled(bool enabled) {
 		setRightSpeed(0);
 	}
 }
+
+void MotorHandler::setThreshold(uint8_t threshold) {
+	this->threshold = threshold;
+}

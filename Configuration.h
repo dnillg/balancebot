@@ -1,13 +1,33 @@
 
-#ifndef BALANCEBOTPINS_H_
-#define BALANCEBOTPINS_H_
+#ifndef CONFIGURATION_H_
+#define CONFIGURATION_H_
 
+// *** LOG *** //
+#define LOG_PID_IO 0
+#define LOG_ENCODER 0
+#define LOG_EFF_FRQ 0
+
+// *** Motors ***
+#define MOTOR_MIN 44
+#define MOTOR_LEFT_OFFSET 3
+#define MOTOR_RIGHT_OFFSET 0
+
+// *** TILT PID *** //
+#define TILT_PID_P 0.59
+#define TILT_PID_I 0
+#define TILT_PID_D 0
+#define TILT_PID_SETPOINT 0
+
+// *** I2C *** //
+#define I2C_ADDR_BNO055 0x29
+#define I2C_ADDR_DISP_16_2 0x3F
+
+// *** PINS *** //
 //Encoder
 #define PIN_ENCODER_RIGHT_A 2 //GREEN UPPER MOTOR
 #define PIN_ENCODER_RIGHT_B 12 //BLUE UPPER MOTOR
 #define PIN_ENCODER_LEFT_A 3 //GREEN, LOWER MOTOR
 #define PIN_ENCODER_LEFT_B 13 //BLUE, LOWER MOTOR
-
 //H-Bridge
 #define PIN_HB_RIGHT_ENABLE 5 //PURPLE (ENB_A)
 #define PIN_HB_LEFT_FORWARD 4 //RED (IN1)

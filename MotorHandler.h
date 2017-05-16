@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#include "BalanceBotPins.h"
+#include "Configuration.h"
 
 class MotorHandler {
 private:
@@ -19,6 +19,7 @@ public:
 	void setRightSpeed(int16_t speed);
 	void setSpeed(int16_t speed, uint8_t enablePin, uint8_t forwardPin, uint8_t backwardPin);
 	void setEnabled(bool enabled);
+	void setThreshold(uint8_t);
 private:
 	void resetPins();
 };

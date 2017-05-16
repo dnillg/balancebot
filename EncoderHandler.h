@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 
+#include "Configuration.h"
 #include "EncoderWheelState.h"
 
 class EncoderHandler {
@@ -18,6 +19,15 @@ public:
 	int16_t getLeftDistance();
 	int16_t getRightDistance();
 	void reset();
+	inline void printDistance() {
+#if LOG_ENCODER
+		Serial.write("encoder;");
+		Serial.print(getLeftDistance());
+		Serial.print(";");
+		Serial.print(getRightDistance());
+		Serial.println();
+#endif
+	}
 };
 
 #endif

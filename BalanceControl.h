@@ -3,29 +3,38 @@
 
 #include <PID_v1.h>
 
+#include "Configuration.h"
 #include "OrientationHandler.h"
 #include "EncoderHandler.h"
 #include "ControlOutput.h"
+#include "PidData.h"
 
 class BalanceControl {
 private:
-	double const TILT_PID_AMP = 1;
-	double const TILT_PID_P = 0.7025 * TILT_PID_AMP;
-	double const TILT_PID_I = 0.0*TILT_PID_P*2 * TILT_PID_AMP;
-	double const TILT_PID_D = TILT_PID_P/12 * TILT_PID_AMP;
-
 	OrientationHandler* orientationHandler;
 	EncoderHandler* encoderHandler;
-	double tiltPidInput = 0;
-	double tiltPidOutput = -1;
-	double tiltPidSetPoint = 0;
-	PID* tiltPid;
+	PidData tiltPidData;
+	PID* tiltPid = 0;
 
-	long lastMillis = -1;
+	inline void printIO() {
+#if LOG_PID_IO
+		Serial.print("pid_io;");
+		Serial.print(tiltPidData.input);
+		Serial.print(";");
+		Serial.print(tiltPidData.output);
+		Serial.println();
+#endif
+	}
+
 public:
-	BalanceControl(OrientationHandler* orientationHandler, EncoderHandler* encoderHandler);
+	BalanceControl(OrientationHandler* orientationHandler,
+			EncoderHandler* encoderHandler);
 	ControlOutput getControlValue();
-	void resetPid(double p, double i, double d);
+	void resetPid(const double& p, const double& i, const double& d, const double& setPoint);
+	double getP() const;
+	double getI() const;
+	double getD() const;
+	const double& getSetPoint() const;
 };
 
 #endif
