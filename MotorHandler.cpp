@@ -1,10 +1,3 @@
-/*
- * MotorHandler.cpp
- *
- *  Created on: 2017. máj. 8.
- *      Author: Reactorx2
- */
-
 #include "MotorHandler.h"
 
 MotorHandler::MotorHandler(uint8_t threshold, uint8_t offsetLeft,
@@ -12,7 +5,7 @@ MotorHandler::MotorHandler(uint8_t threshold, uint8_t offsetLeft,
 	resetPins();
 	this->enabled = true;
 	this->threshold = threshold;
-	this->rangeMultiplier = (UINT8_MAX - threshold) / (double) UINT8_MAX;
+	this->rangeMultiplier = ((double)(UINT8_MAX - threshold)) /  UINT8_MAX;
 	this->offsetLeft = offsetLeft;
 	this->offsetRight = offsetRight;
 }
@@ -62,11 +55,13 @@ void MotorHandler::setSpeed(int16_t speed, uint8_t enablePin,
 
 	if (uspeed != 0) {
 		uspeed = threshold + (uint8_t) (uspeed * rangeMultiplier);
-		analogWrite(enablePin, uspeed);
 		digitalWrite(forwardPin, forward ? HIGH : LOW);
 		digitalWrite(backwardPin, !forward ? HIGH : LOW);
+		analogWrite(enablePin, uspeed);
 	} else {
 		analogWrite(enablePin, 0);
+		digitalWrite(forwardPin, LOW);
+		digitalWrite(backwardPin, LOW);
 	}
 }
 
@@ -80,4 +75,8 @@ void MotorHandler::setEnabled(bool enabled) {
 
 void MotorHandler::setThreshold(uint8_t threshold) {
 	this->threshold = threshold;
+}
+
+uint8_t MotorHandler::getThreshold() {
+	return threshold;
 }

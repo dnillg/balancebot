@@ -236,11 +236,13 @@ public:
 	OrientationHandler();
 	Orientation getOrientation();
 	void printCalibrationData();
+	double static toDegree(double value);
 private:
 	uint8_t readRegister(uint8_t regAddr);
 	void writeRegister(uint8_t key, uint8_t value);
 	void writeCalibrationData();
 	static double toDegree(uint8_t raw);
+	void read(byte* to, uint8_t regAddr, size_t size);
 };
 
 #endif

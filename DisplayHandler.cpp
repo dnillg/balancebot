@@ -12,7 +12,7 @@ void DisplayHandler::initLcd() {
 	lcd = new LiquidCrystal_I2C(I2C_ADDR_DISP_16_2, 2, 1, 0, 4, 5, 6, 7, 3,
 			POSITIVE);
 	lcd->begin(16, 2);
-	lcd->setBacklight(200);
+	lcd->setBacklight(LCD_BACKLIGHT_INTENSITY);
 	uint8_t backslash[8] = { 0b00000, 0b10000, 0b01000, 0b00100, 0b00010,
 			0b00001, 0b00000, 0b00000 };
 	lcd->createChar(0, backslash);

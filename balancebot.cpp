@@ -1,5 +1,5 @@
-#define SERIAL_RX_BUFFER_SIZE 96
-#define SERIAL_TX_BUFFER_SIZE 96
+#define SERIAL_RX_BUFFER_SIZE 64
+#define SERIAL_TX_BUFFER_SIZE 192
 
 #include "Arduino.h"
 
@@ -32,6 +32,7 @@ void updateRightWheel();
 void printEffectiveFrequency();
 void printEffectiveFrequencyLcd();
 void printStatusCharLcd();
+void registerScheduledJobs();
 
 void setup() {
 	pinMode(PIN_ENCODER_LEFT_A, INPUT);
@@ -47,12 +48,10 @@ void setup() {
 
 	attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_RIGHT_A),
 			updateRightWheel, CHANGE);
-	attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_LEFT_A), updateLeftWheel,
-	CHANGE);
+	attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_LEFT_A),
+			updateLeftWheel, CHANGE);
 
-	Serial.begin(38400);
-	while (!Serial)
-		;
+	Serial.begin(SERIAL_BAUD);
 
 	context.motorHandler = new MotorHandler(MOTOR_MIN, MOTOR_LEFT_OFFSET,
 	MOTOR_RIGHT_OFFSET);
@@ -60,36 +59,36 @@ void setup() {
 	context.encoderHandler = new EncoderHandler();
 	context.balanceControl = new BalanceControl(context.orientationHandler,
 			context.encoderHandler);
-	context.frequencyRegulator = new FrequencyRegulator(100);
-	context.displayHandler = new DisplayHandler(context.balanceControl,
-			context.frequencyRegulator);
+	context.frequencyRegulator = new FrequencyRegulator(NOMINAL_FRQ);
+	context.displayHandler = new DisplayHandler(context.balanceControl, context.frequencyRegulator);
 	context.jobScheduler = new JobScheduler();
 	context.commandParser = new SerialCommandParser(context.balanceControl, context.motorHandler, context.displayHandler);
 
-	context.jobScheduler->addJob(100, printEffectiveFrequency);
-	context.jobScheduler->addJob(500, printEffectiveFrequencyLcd);
-	context.jobScheduler->addJob(100, printStatusCharLcd);
+	registerScheduledJobs();
 
 	context.displayHandler->printParams(context.balanceControl->getP(),
 			context.balanceControl->getI(), context.balanceControl->getD());
 }
 
-unsigned long loops = 0;
-
 void loop() {
 	context.commandParser->handleCommands();
 	context.frequencyRegulator->waitTick();
 	context.jobScheduler->tick();
+
 	ControlOutput output = context.balanceControl->getControlValue();
 	context.motorHandler->setLeftSpeed(output.left);
 	context.motorHandler->setRightSpeed(output.right);
 
-	if (millis() > 2000000) {
-		context.motorHandler->setEnabled(0);
-	}
-
 	Serial.flush();
-	loops++;
+}
+
+void registerScheduledJobs() {
+	context.jobScheduler->addJob(SJF_EFFECTIVE_FRQ_LOG,
+			printEffectiveFrequency);
+	context.jobScheduler->addJob(SJF_EFFECTIVE_FRQ_LCD,
+			printEffectiveFrequencyLcd);
+	context.jobScheduler->addJob(SJF_STATUS_CHAR_LCD,
+			printStatusCharLcd);
 }
 
 void updateLeftWheel() {
@@ -114,3 +113,4 @@ void printEffectiveFrequencyLcd() {
 void printStatusCharLcd() {
 	context.displayHandler->printStatusChar();
 }
+

@@ -1,22 +1,38 @@
-
 #ifndef CONFIGURATION_H_
 #define CONFIGURATION_H_
 
+#define SERIAL_BAUD 115200
+
 // *** LOG *** //
-#define LOG_PID_IO 0
+#define LOG_PID_IO 1
 #define LOG_ENCODER 0
 #define LOG_EFF_FRQ 0
 
+#define LOG_FLOAT_WIDTH 3
+#define LOG_FLOAT_PREC 7
+#define LOG_FLOAT_BUF_SIZE 10
+
+// *** CONTROL ***
+#define NOMINAL_FRQ 100
+
+// *** SCHEDULED JOB FREQUENCY ***
+#define SJF_EFFECTIVE_FRQ_LOG 100
+#define SJF_EFFECTIVE_FRQ_LCD 500
+#define SJF_STATUS_CHAR_LCD 500
+
+// *** LCD ***
+#define LCD_BACKLIGHT_INTENSITY 225
+
 // *** Motors ***
-#define MOTOR_MIN 44
-#define MOTOR_LEFT_OFFSET 3
+#define MOTOR_MIN 52
+#define MOTOR_LEFT_OFFSET 0
 #define MOTOR_RIGHT_OFFSET 0
 
 // *** TILT PID *** //
-#define TILT_PID_P 0.59
+#define TILT_PID_P 1.3
 #define TILT_PID_I 0
-#define TILT_PID_D 0
-#define TILT_PID_SETPOINT 0
+#define TILT_PID_D 0.09
+#define TILT_PID_SETPOINT 10
 
 // *** I2C *** //
 #define I2C_ADDR_BNO055 0x29

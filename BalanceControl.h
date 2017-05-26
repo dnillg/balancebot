@@ -18,11 +18,11 @@ private:
 
 	inline void printIO() {
 #if LOG_PID_IO
-		Serial.print("pid_io;");
-		Serial.print(tiltPidData.input);
-		Serial.print(";");
-		Serial.print(tiltPidData.output);
-		Serial.println();
+		Serial.print("roll;");
+		Serial.println(OrientationHandler::toDegree(tiltPidData.input));
+
+		Serial.print("tilt_pid_out;");
+		Serial.println(round(tiltPidData.output));
 #endif
 	}
 

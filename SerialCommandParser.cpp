@@ -1,10 +1,3 @@
-/*
- * SerialCommandParser.cpp
- *
- *  Created on: 2017. máj. 14.
- *      Author: Reactorx2
- */
-
 #include "SerialCommandParser.h"
 
 SerialCommandParser::SerialCommandParser(BalanceControl* balanceControl,
@@ -30,14 +23,18 @@ void SerialCommandParser::handleCommands() {
 
 void SerialCommandParser::parseCommand() {
 	String command = commandBuffer.getData();
-	if (command.startsWith("set_pid")) {
+	if (command.startsWith("set_tilt_pid_params")) {
 		parseSetPidCommand();
 	} else if (command.startsWith("motor_off")) {
 		parseMotorOffCommand();
 	} else if (command.startsWith("motor_on")) {
 		parseMotorOnCommand();
 	} else if (command.startsWith("set_motor_min")) {
-		parseMotorMinCommand();
+		parseSetMotorMinCommand();
+	} else if (command.startsWith("get_tilt_pid_params")) {
+		parseGetTiltPidCommand();
+	} else if (command.startsWith("get_motor_min")) {
+		parseGetMotorMinCommand();
 	}
 }
 
@@ -65,11 +62,29 @@ void SerialCommandParser::parseSetPidCommand() {
 	motorHandler->setEnabled(true);
 }
 
-void SerialCommandParser::parseMotorMinCommand() {
+void SerialCommandParser::parseSetMotorMinCommand() {
 	char* cmd = commandBuffer.getData();
 	char* t;
 	strtok_r(cmd, ";", &t);
 	uint8_t motorMin = atoi(t);
 	while (strtok_r(0, ";", &t));
 	motorHandler->setThreshold(motorMin);
+}
+
+void SerialCommandParser::parseGetMotorMinCommand() {
+	Serial.print("motor_min;");
+	Serial.println(motorHandler->getThreshold());
+}
+
+void SerialCommandParser::parseGetTiltPidCommand() {
+	Serial.print("tilt_pid_params;");
+	char buf[LOG_FLOAT_BUF_SIZE];
+	dtostrf(balanceControl->getP(), LOG_FLOAT_WIDTH, LOG_FLOAT_PREC, buf);
+	Serial.print(buf);
+	Serial.print(";");
+	dtostrf(balanceControl->getI(), LOG_FLOAT_WIDTH, LOG_FLOAT_PREC, buf);
+	Serial.print(buf);
+	Serial.print(";");
+	dtostrf(balanceControl->getD(), LOG_FLOAT_WIDTH, LOG_FLOAT_PREC, buf);
+	Serial.println(buf);
 }

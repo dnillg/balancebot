@@ -1,10 +1,3 @@
-/*
- * BalanceControl.cpp
- *
- *  Created on: 2017. máj. 8.
- *      Author: Reactorx2
- */
-
 #include "BalanceControl.h"
 
 BalanceControl::BalanceControl(OrientationHandler* orientationHandler,
@@ -15,11 +8,12 @@ BalanceControl::BalanceControl(OrientationHandler* orientationHandler,
 }
 
 ControlOutput BalanceControl::getControlValue() {
+	//TODO: Resolve spikes
 	Orientation orientation = orientationHandler->getOrientation();
-	tiltPidData.input = orientation.roll;
-	if(orientation.roll > 200 || orientation.roll < -200) {
-		//Serial.println(orientation.roll);
+	if (abs(orientation.roll - tiltPidData.input) > 100) {
+		orientation = orientationHandler->getOrientation();
 	}
+	tiltPidData.input = orientation.roll;
 	tiltPid->Compute();
 	printIO();
 	return ControlOutput(tiltPidData.output, tiltPidData.output);
@@ -27,14 +21,16 @@ ControlOutput BalanceControl::getControlValue() {
 
 void BalanceControl::resetPid(const double& p, const double& i, const double& d,
 		const double& setPoint) {
-	if(tiltPid != NULL) {
+	if (tiltPid != NULL) {
 		delete this->tiltPid;
 	}
+	tiltPidData = PidData();
 	this->tiltPidData.setPoint = setPoint;
 	this->tiltPid = new PID(&tiltPidData.input, &tiltPidData.output,
 			&tiltPidData.setPoint, p, i, d, REVERSE);
 	tiltPid->SetMode(AUTOMATIC);
-		tiltPid->SetOutputLimits(-255, 255);
+	tiltPid->SetOutputLimits(-UINT8_MAX, UINT8_MAX);
+	tiltPid->SetSampleTime((int)round(1000.0/NOMINAL_FRQ));
 }
 
 double BalanceControl::getP() const {

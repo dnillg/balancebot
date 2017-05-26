@@ -13,4 +13,4 @@ public:
 	Orientation();
 };
 
-#endif /* ORIENTATION_H_ */
+#endif

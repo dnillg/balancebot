@@ -20,6 +20,7 @@ public:
 	void setSpeed(int16_t speed, uint8_t enablePin, uint8_t forwardPin, uint8_t backwardPin);
 	void setEnabled(bool enabled);
 	void setThreshold(uint8_t);
+	uint8_t getThreshold();
 private:
 	void resetPins();
 };

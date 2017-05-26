@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include "String.h"
 
+#include "Configuration.h"
 #include "AvrVector.h"
 #include "BalanceControl.h"
 #include "MotorHandler.h"
@@ -24,7 +25,9 @@ private:
 	void parseSetPidCommand();
 	void parseMotorOffCommand();
 	void parseMotorOnCommand();
-	void parseMotorMinCommand();
+	void parseSetMotorMinCommand();
+	void parseGetTiltPidCommand();
+	void parseGetMotorMinCommand();
 };
 
 #endif
