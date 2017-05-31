@@ -1,5 +1,5 @@
-#define SERIAL_RX_BUFFER_SIZE 64
-#define SERIAL_TX_BUFFER_SIZE 192
+#define SERIAL_RX_BUFFER_SIZE 32
+#define SERIAL_TX_BUFFER_SIZE 32
 
 #include "Arduino.h"
 
@@ -79,7 +79,7 @@ void loop() {
 	context.motorHandler->setLeftSpeed(output.left);
 	context.motorHandler->setRightSpeed(output.right);
 
-	Serial.flush();
+	//Serial.flush();
 }
 
 void registerScheduledJobs() {

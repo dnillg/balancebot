@@ -28,6 +28,10 @@ private:
 	void parseSetMotorMinCommand();
 	void parseGetTiltPidCommand();
 	void parseGetMotorMinCommand();
+	void parseSetMotorOffsetsCommand();
+	void parseSetSetPointsCommand();
+	void parseGetSetPointsCommand();
+	void parseGetMotorOffsetsCommand();
 };
 
 #endif

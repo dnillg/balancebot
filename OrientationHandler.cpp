@@ -5,7 +5,7 @@ OrientationHandler::OrientationHandler() {
 	Wire.setClock(400000L);
 	writeRegister(BNO055_OPR_MODE_ADDR, OPERATION_MODE_CONFIG);
 	delay(30);
-	//writeCalibrationData();
+	writeCalibrationData();
 	writeRegister(BNO055_SYS_TRIGGER_ADDR, 0x0);
 	delay(30);
 	writeRegister(BNO055_OPR_MODE_ADDR, OPERATION_MODE_NDOF);
@@ -17,13 +17,6 @@ Orientation OrientationHandler::getOrientation() {
 	read((byte*)&orientation.pitch, BNO055_EULER_P_MSB_ADDR, 2);
 	read((byte*)&orientation.roll, BNO055_EULER_R_LSB_ADDR, 2);
 	read((byte*)&orientation.yaw, BNO055_EULER_H_MSB_ADDR, 2);
-	//Serial.println(orientation.roll);
-//	orientation.pitch |= readRegister(BNO055_EULER_P_MSB_ADDR) << 8;
-//	orientation.pitch |= readRegister(BNO055_EULER_P_LSB_ADDR);
-//	orientation.roll |= readRegister(BNO055_EULER_R_MSB_ADDR) << 8;
-//	orientation.roll |= readRegister(BNO055_EULER_R_LSB_ADDR);
-//	orientation.yaw |= readRegister(BNO055_EULER_H_MSB_ADDR) << 8;
-//	orientation.yaw |= readRegister(BNO055_EULER_H_LSB_ADDR);
 	return orientation;
 }
 

@@ -21,11 +21,12 @@ public:
 	void reset();
 	inline void printDistance() {
 #if LOG_ENCODER
-		Serial.write("encoder;");
-		Serial.print(getLeftDistance());
-		Serial.print(";");
-		Serial.print(getRightDistance());
-		Serial.println();
+//		Serial.print("ecl;");
+//		Serial.println(getLeftDistance());
+//		Serial.print("ecr;");
+//		Serial.println(getRightDistance());
+		Serial.print("ecd;");
+		Serial.println(getDistance());
 #endif
 	}
 };

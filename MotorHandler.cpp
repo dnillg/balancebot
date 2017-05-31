@@ -5,7 +5,7 @@ MotorHandler::MotorHandler(uint8_t threshold, uint8_t offsetLeft,
 	resetPins();
 	this->enabled = true;
 	this->threshold = threshold;
-	this->rangeMultiplier = ((double)(UINT8_MAX - threshold)) /  UINT8_MAX;
+	this->rangeMultiplier = ((double) (UINT8_MAX - threshold)) / UINT8_MAX;
 	this->offsetLeft = offsetLeft;
 	this->offsetRight = offsetRight;
 }
@@ -19,17 +19,34 @@ void MotorHandler::resetPins() {
 	digitalWrite(PIN_HB_RIGHT_ENABLE, LOW);
 }
 
-void MotorHandler::setLeftSpeed(int16_t speed) {
-	if (speed != 0) {
-		speed = speed + offsetLeft;
+uint8_t MotorHandler::getOffsetLeft() const {
+	return offsetLeft;
+}
+
+uint8_t MotorHandler::getOffsetRight() const {
+	return offsetRight;
+}
+
+int16_t MotorHandler::getSpeedWithOffset(int16_t speed, uint8_t offset) {
+	if (speed > 0) {
+		speed = speed + offset;
+	} else if (speed < 0) {
+		speed = speed - offset;
 	}
+	return speed;
+}
+
+void MotorHandler::setLeftSpeed(int16_t speed) {
+	speed = getSpeedWithOffset(speed, offsetLeft);
 	setSpeed(speed, PIN_HB_LEFT_ENABLE, PIN_HB_LEFT_FORWARD,
 	PIN_HB_LEFT_BACKWARD);
 }
 
 void MotorHandler::setRightSpeed(int16_t speed) {
-	if (speed != 0) {
+	if (speed > 0) {
 		speed = speed + offsetRight;
+	} else if (speed < 0) {
+		speed = speed - offsetRight;
 	}
 	setSpeed(speed, PIN_HB_RIGHT_ENABLE, PIN_HB_RIGHT_FORWARD,
 	PIN_HB_RIGHT_BACKWARD);
@@ -37,7 +54,7 @@ void MotorHandler::setRightSpeed(int16_t speed) {
 
 void MotorHandler::setSpeed(int16_t speed, uint8_t enablePin,
 		uint8_t forwardPin, uint8_t backwardPin) {
-	if(!enabled) {
+	if (!enabled) {
 		speed = 0;
 	}
 
@@ -67,7 +84,7 @@ void MotorHandler::setSpeed(int16_t speed, uint8_t enablePin,
 
 void MotorHandler::setEnabled(bool enabled) {
 	this->enabled = enabled;
-	if(!enabled) {
+	if (!enabled) {
 		setLeftSpeed(0);
 		setRightSpeed(0);
 	}
@@ -79,4 +96,12 @@ void MotorHandler::setThreshold(uint8_t threshold) {
 
 uint8_t MotorHandler::getThreshold() {
 	return threshold;
+}
+
+void MotorHandler::setOffsetLeft(uint8_t offset) {
+	offsetLeft = offset;
+}
+
+void MotorHandler::setOffsetRight(uint8_t offset) {
+	offsetRight = offset;
 }

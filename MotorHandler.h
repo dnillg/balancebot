@@ -21,8 +21,13 @@ public:
 	void setEnabled(bool enabled);
 	void setThreshold(uint8_t);
 	uint8_t getThreshold();
+	void setOffsetLeft(uint8_t offset);
+	void setOffsetRight(uint8_t offset);
+	uint8_t getOffsetLeft() const;
+	uint8_t getOffsetRight() const;
 private:
 	void resetPins();
+	inline int16_t getSpeedWithOffset(int16_t speed, uint8_t offset);
 };
 
 #endif

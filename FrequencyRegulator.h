@@ -22,7 +22,7 @@ public:
 	void addTimedJob(uint8_t periodMillis, void (*userFunc)(void));
 	inline void printEffectiveFrequency() {
 #if LOG_EFF_FRQ
-		Serial.print("eff_frq;");
+		Serial.print("frq;");
 		Serial.println(lastEffectiveFrq);
 #endif
 	}
