@@ -2,7 +2,7 @@
 #define DISPLAYHANDLER_H_
 
 #include "Arduino.h"
-#include "new_liquid_crystal/LiquidCrystal_I2C.h"
+#include "LiquidCrystal_I2C.h"
 
 #include "Configuration.h"
 #include "FrequencyRegulator.h"

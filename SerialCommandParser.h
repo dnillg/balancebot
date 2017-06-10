@@ -18,18 +18,17 @@ private:
 	DisplayHandler* displayHandler;
 public:
 	SerialCommandParser(BalanceControl* balanceControl, MotorHandler* motorHandler, DisplayHandler* displayHandler);
-	void handleCommands();
+	void readNativeSerialCommands();
+	void parseCommand(char* command);
 private:
-	void resetPid(char* params);
-	void parseCommand();
-	void parseSetPidCommand();
+	void parseSetPidCommand(char* cmd);
 	void parseMotorOffCommand();
 	void parseMotorOnCommand();
-	void parseSetMotorMinCommand();
+	void parseSetMotorMinCommand(char* cmd);
 	void parseGetTiltPidCommand();
 	void parseGetMotorMinCommand();
-	void parseSetMotorOffsetsCommand();
-	void parseSetSetPointsCommand();
+	void parseSetMotorOffsetsCommand(char* cmd);
+	void parseSetSetPointsCommand(char* cmd);
 	void parseGetSetPointsCommand();
 	void parseGetMotorOffsetsCommand();
 };

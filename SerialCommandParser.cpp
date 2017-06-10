@@ -7,13 +7,12 @@ SerialCommandParser::SerialCommandParser(BalanceControl* balanceControl,
 	this->displayHandler = displayHandler;
 }
 
-void SerialCommandParser::handleCommands() {
-
+void SerialCommandParser::readNativeSerialCommands() {
 	while (Serial.available() > 0) {
 		char c = Serial.read();
 		if (c == '\n') {
 			commandBuffer.push_back('\0');
-			parseCommand();
+			parseCommand(commandBuffer.getData());
 			commandBuffer = AvrVector<char>();
 		} else {
 			commandBuffer.push_back(c);
@@ -21,10 +20,10 @@ void SerialCommandParser::handleCommands() {
 	}
 }
 
-void SerialCommandParser::parseCommand() {
-	String command = commandBuffer.getData();
+void SerialCommandParser::parseCommand(char* cmdChr) {
+	String command = cmdChr;
 	if (command.startsWith("set_tilt_pid_params")) {
-		parseSetPidCommand();
+		parseSetPidCommand(cmdChr);
 	} else if (command.startsWith("motor_off")) {
 		parseMotorOffCommand();
 	} else if (command.startsWith("motor_on")) {
@@ -32,22 +31,21 @@ void SerialCommandParser::parseCommand() {
 	} else if (command.startsWith("get_tilt_pid_params")) {
 		parseGetTiltPidCommand();
 	} else if (command.startsWith("set_motor_min")) {
-			parseSetMotorMinCommand();
+			parseSetMotorMinCommand(cmdChr);
 	} else if (command.startsWith("get_motor_min")) {
 		parseGetMotorMinCommand();
 	} else if (command.startsWith("set_setpoints")) {
-		parseSetSetPointsCommand();
+		parseSetSetPointsCommand(cmdChr);
 	} else if (command.startsWith("get_setpoints")) {
 		parseGetSetPointsCommand();
 	} else if (command.startsWith("set_motor_offsets")) {
-		parseSetMotorOffsetsCommand();
+		parseSetMotorOffsetsCommand(cmdChr);
 	} else if (command.startsWith("get_motor_offsets")) {
 		parseGetMotorOffsetsCommand();
 	}
 }
 
-void SerialCommandParser::parseSetMotorOffsetsCommand() {
-	char* cmd = commandBuffer.getData();
+void SerialCommandParser::parseSetMotorOffsetsCommand(char* cmd) {
 	char* t;
 	strtok_r(cmd, ";", &t);
 	uint8_t offsetLeft = atoi(t);
@@ -58,8 +56,7 @@ void SerialCommandParser::parseSetMotorOffsetsCommand() {
 	motorHandler->setOffsetRight(offsetRight);
 }
 
-void SerialCommandParser::parseSetSetPointsCommand() {
-	char* cmd = commandBuffer.getData();
+void SerialCommandParser::parseSetSetPointsCommand(char* cmd) {
 	char* t;
 	strtok_r(cmd, ";", &t);
 	int16_t balance = atoi(t);
@@ -92,8 +89,7 @@ void SerialCommandParser::parseMotorOffCommand() {
 	motorHandler->setEnabled(false);
 }
 
-void SerialCommandParser::parseSetPidCommand() {
-	char* cmd = commandBuffer.getData();
+void SerialCommandParser::parseSetPidCommand(char* cmd) {
 	char* t;
 	strtok_r(cmd, ";", &t);
 	double p = atof(t);
@@ -108,8 +104,7 @@ void SerialCommandParser::parseSetPidCommand() {
 	motorHandler->setEnabled(true);
 }
 
-void SerialCommandParser::parseSetMotorMinCommand() {
-	char* cmd = commandBuffer.getData();
+void SerialCommandParser::parseSetMotorMinCommand(char* cmd) {
 	char* t;
 	strtok_r(cmd, ";", &t);
 	uint8_t motorMin = atoi(t);

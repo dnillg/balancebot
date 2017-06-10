@@ -13,6 +13,7 @@
 #include "DisplayHandler.h"
 #include "JobScheduler.h"
 #include "SerialCommandParser.h"
+#include "LedMatrixHandler.h"
 
 typedef struct {
 	MotorHandler* motorHandler;
@@ -23,6 +24,7 @@ typedef struct {
 	JobScheduler* jobScheduler;
 	DisplayHandler* displayHandler;
 	SerialCommandParser* commandParser;
+	LedMatrixHandler* ledMatrixHandler;
 } Context;
 
 Context context;
@@ -35,10 +37,10 @@ void printStatusCharLcd();
 void registerScheduledJobs();
 
 void setup() {
-	pinMode(PIN_ENCODER_LEFT_A, INPUT);
-	pinMode(PIN_ENCODER_LEFT_A, INPUT);
+	pinMode(PIN_ENCODER_LEFT_A, INPUT_PULLUP);
+	pinMode(PIN_ENCODER_LEFT_B, INPUT);
 	pinMode(PIN_ENCODER_RIGHT_A, INPUT_PULLUP);
-	pinMode(PIN_ENCODER_RIGHT_B, INPUT_PULLUP);
+	pinMode(PIN_ENCODER_RIGHT_B, INPUT);
 	pinMode(PIN_HB_RIGHT_ENABLE, OUTPUT);
 	pinMode(PIN_HB_LEFT_FORWARD, OUTPUT);
 	pinMode(PIN_HB_LEFT_BACKWARD, OUTPUT);
@@ -63,15 +65,16 @@ void setup() {
 	context.displayHandler = new DisplayHandler(context.balanceControl, context.frequencyRegulator);
 	context.jobScheduler = new JobScheduler();
 	context.commandParser = new SerialCommandParser(context.balanceControl, context.motorHandler, context.displayHandler);
+	context.ledMatrixHandler = new LedMatrixHandler();
 
 	registerScheduledJobs();
 
 	context.displayHandler->printParams(context.balanceControl->getP(),
-			context.balanceControl->getI(), context.balanceControl->getD());
+	context.balanceControl->getI(), context.balanceControl->getD());
 }
 
 void loop() {
-	context.commandParser->handleCommands();
+	context.commandParser->readNativeSerialCommands();
 	context.frequencyRegulator->waitTick();
 	context.jobScheduler->tick();
 
