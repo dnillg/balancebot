@@ -5,6 +5,7 @@
 #include "Arduino.h"
 
 #include "Configuration.h"
+#include "Logging.h"
 #include "Orientation.h"
 
 class OrientationHandler {

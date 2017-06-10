@@ -4,6 +4,7 @@
 #include "Arduino.h"
 
 #include "Configuration.h"
+#include "Logging.h"
 #include "EncoderWheelState.h"
 
 class EncoderHandler {
@@ -21,12 +22,12 @@ public:
 	void reset();
 	inline void printDistance() {
 #if LOG_ENCODER
-//		Serial.print("ecl;");
-//		Serial.println(getLeftDistance());
-//		Serial.print("ecr;");
-//		Serial.println(getRightDistance());
-		Serial.print("ecd;");
-		Serial.println(getDistance());
+//		LOGGER.print("ecl;");
+//		LOGGER.println(getLeftDistance());
+//		LOGGER.print("ecr;");
+//		LOGGER.println(getRightDistance());
+		LOGGER.print("ecd;");
+		LOGGER.println(getDistance());
 #endif
 	}
 };

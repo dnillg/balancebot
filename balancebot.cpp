@@ -12,8 +12,11 @@
 #include "FrequencyRegulator.h"
 #include "DisplayHandler.h"
 #include "JobScheduler.h"
-#include "SerialCommandParser.h"
 #include "LedMatrixHandler.h"
+#include "CommandParser.h"
+#include "SoftwareSerial.h"
+#include "BluetoothSerial.h"
+#include "Logging.h"
 
 typedef struct {
 	MotorHandler* motorHandler;
@@ -23,7 +26,8 @@ typedef struct {
 	FrequencyRegulator* frequencyRegulator;
 	JobScheduler* jobScheduler;
 	DisplayHandler* displayHandler;
-	SerialCommandParser* commandParser;
+	CommandParser<HardwareSerial>* hwsCommandParser;
+	CommandParser<SoftwareSerial>* btCommandParser;
 	LedMatrixHandler* ledMatrixHandler;
 } Context;
 
@@ -54,6 +58,7 @@ void setup() {
 			updateLeftWheel, CHANGE);
 
 	Serial.begin(SERIAL_BAUD);
+	BtSerial.begin(HC_06_DEFAULT_BAUDRATE);
 
 	context.motorHandler = new MotorHandler(MOTOR_MIN, MOTOR_LEFT_OFFSET,
 	MOTOR_RIGHT_OFFSET);
@@ -64,7 +69,8 @@ void setup() {
 	context.frequencyRegulator = new FrequencyRegulator(NOMINAL_FRQ);
 	context.displayHandler = new DisplayHandler(context.balanceControl, context.frequencyRegulator);
 	context.jobScheduler = new JobScheduler();
-	context.commandParser = new SerialCommandParser(context.balanceControl, context.motorHandler, context.displayHandler);
+	context.hwsCommandParser = new CommandParser<HardwareSerial>(&Serial, context.balanceControl, context.motorHandler, context.displayHandler);
+	context.btCommandParser = new CommandParser<SoftwareSerial>(&BtSerial, context.balanceControl, context.motorHandler, context.displayHandler);
 	context.ledMatrixHandler = new LedMatrixHandler();
 
 	registerScheduledJobs();
@@ -74,7 +80,8 @@ void setup() {
 }
 
 void loop() {
-	context.commandParser->readNativeSerialCommands();
+	context.btCommandParser->readNativeSerialCommands();
+	context.hwsCommandParser->readNativeSerialCommands();
 	context.frequencyRegulator->waitTick();
 	context.jobScheduler->tick();
 
@@ -83,6 +90,7 @@ void loop() {
 	context.motorHandler->setRightSpeed(output.right);
 
 	//Serial.flush();
+	//BtSerial.flush();
 }
 
 void registerScheduledJobs() {

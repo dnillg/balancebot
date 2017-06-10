@@ -4,6 +4,7 @@
 #include <PID_v1.h>
 
 #include "Configuration.h"
+#include "Logging.h"
 #include "OrientationHandler.h"
 #include "EncoderHandler.h"
 #include "ControlOutput.h"
@@ -22,16 +23,16 @@ private:
 
 	inline void printIO() {
 #if LOG_TILT_PID_IO
-		Serial.print("tpi;");
-		Serial.println(OrientationHandler::toDegree(tiltPidData.input));
-		Serial.print("tpo;");
-		Serial.println(round(tiltPidData.output));
+		LOGGER.print("tpi;");
+		LOGGER.println(OrientationHandler::toDegree(tiltPidData.input));
+		LOGGER.print("tpo;");
+		LOGGER.println(round(tiltPidData.output));
 #endif
 #if LOG_DIST_PID_IO
-		Serial.print("dpi;");
-		Serial.println(OrientationHandler::toDegree(tiltPidData.input));
-		Serial.print("dpo;");
-		Serial.println(round(tiltPidData.output));
+		LOGGER.print("dpi;");
+		LOGGER.println(OrientationHandler::toDegree(tiltPidData.input));
+		LOGGER.print("dpo;");
+		LOGGER.println(round(tiltPidData.output));
 #endif
 	}
 

@@ -24,12 +24,12 @@ void OrientationHandler::printCalibrationData() {
 	uint8_t calib = readRegister(BNO055_CALIB_STAT_ADDR);
 	char buf[4];
 	sprintf(buf, "%02X", calib);
-	Serial.print(buf);
+	LOGGER.print(buf);
 	for (int i = 0; i < 22; i++) {
 		sprintf(buf, ";%02X", readRegister(0x55 + i));
-		Serial.print(buf);
+		LOGGER.print(buf);
 	}
-	Serial.println();
+	LOGGER.println();
 }
 
 uint8_t OrientationHandler::readRegister(uint8_t regAddr) {

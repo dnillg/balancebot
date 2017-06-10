@@ -2,10 +2,10 @@
 #define CONFIGURATION_H_
 
 // *** LOG *** //
-#define LOG_TILT_PID_IO 1
-#define LOG_DIST_PID_IO 1
-#define LOG_ENCODER 1
-#define LOG_EFF_FRQ 1
+#define LOG_TILT_PID_IO 0
+#define LOG_DIST_PID_IO 0
+#define LOG_ENCODER 0
+#define LOG_EFF_FRQ 0
 
 #define LOG_FLOAT_WIDTH 3
 #define LOG_FLOAT_PREC 7
