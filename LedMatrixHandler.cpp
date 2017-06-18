@@ -4,7 +4,7 @@ LedMatrixHandler::LedMatrixHandler() {
 	ledControl.shutdown(0, false);
 	ledControl.setIntensity(0, LED_MATRIX_LIGHT_INTENSITY);
 	ledControl.clearDisplay(0);
-	drawImage(IMAGE_SMILEY_HAPPY);
+	drawImage(IMAGE_EYE_OPEN);
 }
 
 void LedMatrixHandler::drawImage(const char image[]) {
@@ -15,3 +15,4 @@ void LedMatrixHandler::drawImage(const char image[]) {
 
 const char LedMatrixHandler::IMAGE_SMILEY_HAPPY[8] = {0x00, 0x24, 0x00, 0x00, 0x00, 0x42, 0x3C, 0x00};
 const char LedMatrixHandler::IMAGE_SMILEY_SAD[8] = {0x00, 0x24, 0x00, 0x00, 0x00, 0x3C, 0x42, 0x00};
+const char LedMatrixHandler::IMAGE_EYE_OPEN[8] = {0x18, 0x24, 0x5A, 0x5A, 0x5A, 0x5A, 0x24, 0x18};

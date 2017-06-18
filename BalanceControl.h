@@ -8,6 +8,7 @@
 #include "OrientationHandler.h"
 #include "EncoderHandler.h"
 #include "ControlOutput.h"
+#include "ControlState.h"
 #include "PidData.h"
 
 class BalanceControl {
@@ -20,35 +21,45 @@ private:
 	PID* distPid = 0;
 	int16_t balanceSetPoint = TILT_PID_BALANCE_SETPOINT;
 	int16_t directionSetPoint = TILT_PID_FORWARD_SETPOINT;
+	ControlState controlState;
 
-	inline void printIO() {
+	inline void printTiltIO() {
 #if LOG_TILT_PID_IO
 		LOGGER.print("tpi;");
 		LOGGER.println(OrientationHandler::toDegree(tiltPidData.input));
 		LOGGER.print("tpo;");
 		LOGGER.println(round(tiltPidData.output));
 #endif
+	}
+
+	inline void printDistIO() {
 #if LOG_DIST_PID_IO
 		LOGGER.print("dpi;");
-		LOGGER.println(OrientationHandler::toDegree(tiltPidData.input));
+		LOGGER.println(distPidData.input);
 		LOGGER.print("dpo;");
-		LOGGER.println(round(tiltPidData.output));
+		LOGGER.println(distPidData.output);
 #endif
 	}
+
+	double calculateTiltPidSetPoint();
 
 public:
 	BalanceControl(OrientationHandler* orientationHandler,
 			EncoderHandler* encoderHandler);
-	ControlOutput getControlValue();
+	ControlOutput getControlOutput();
 	void resetTiltPid(const double& p, const double& i, const double& d);
 	void resetDistPid(const double& p, const double& i, const double& d);
-	double getP() const;
-	double getI() const;
-	double getD() const;
+	double getTiltP() const;
+	double getTiltI() const;
+	double getTiltD() const;
+	double getDistP() const;
+	double getDistI() const;
+	double getDistD() const;
 	int16_t getBalanceSetPoint() const;
 	void setBalanceSetPoint(int16_t balanceSetPoint);
 	int16_t getDirectionSetPoint() const;
 	void setDirectionSetPoint(int16_t directionSetPoint);
+	void setControlState(ControlState controlState);
 };
 
 #endif

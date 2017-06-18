@@ -1,5 +1,5 @@
-#define SERIAL_RX_BUFFER_SIZE 32
-#define SERIAL_TX_BUFFER_SIZE 32
+#define SERIAL_RX_BUFFER_SIZE 128
+#define SERIAL_TX_BUFFER_SIZE 128
 
 #include "Arduino.h"
 
@@ -59,6 +59,7 @@ void setup() {
 
 	Serial.begin(SERIAL_BAUD);
 	BtSerial.begin(HC_06_DEFAULT_BAUDRATE);
+	BtSerial.println("AT+BAUD" + HC_06_BAUD_RATE_LEVEL);
 
 	context.motorHandler = new MotorHandler(MOTOR_MIN, MOTOR_LEFT_OFFSET,
 	MOTOR_RIGHT_OFFSET);
@@ -75,8 +76,8 @@ void setup() {
 
 	registerScheduledJobs();
 
-	context.displayHandler->printParams(context.balanceControl->getP(),
-	context.balanceControl->getI(), context.balanceControl->getD());
+	context.displayHandler->printParams(context.balanceControl->getTiltP(),
+	context.balanceControl->getTiltI(), context.balanceControl->getTiltD());
 }
 
 void loop() {
@@ -85,7 +86,7 @@ void loop() {
 	context.frequencyRegulator->waitTick();
 	context.jobScheduler->tick();
 
-	ControlOutput output = context.balanceControl->getControlValue();
+	ControlOutput output = context.balanceControl->getControlOutput();
 	context.motorHandler->setLeftSpeed(output.left);
 	context.motorHandler->setRightSpeed(output.right);
 

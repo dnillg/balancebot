@@ -5,11 +5,11 @@
 
 class EncoderWheelState {
 private:
-	int16_t ticks;
+	int32_t ticks;
 	uint8_t lastA;
 public:
 	EncoderWheelState();
-	int16_t getTicks();
+	int32_t getTicks();
 	void update(uint8_t a, uint8_t b);
 };
 

@@ -8,15 +8,15 @@ void EncoderHandler::updateRightWheel(uint8_t a, uint8_t b) {
 	rightWheelState.update(a, b);
 }
 
-int16_t EncoderHandler::getDistance() {
+int32_t EncoderHandler::getDistance() {
 	return (leftWheelState.getTicks() - rightWheelState.getTicks()) / 2;
 }
 
-int16_t EncoderHandler::getLeftDistance() {
+int32_t EncoderHandler::getLeftDistance() {
 	return leftWheelState.getTicks();
 }
 
-int16_t EncoderHandler::getRightDistance() {
+int32_t EncoderHandler::getRightDistance() {
 	return -rightWheelState.getTicks();
 }
 

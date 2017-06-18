@@ -5,7 +5,7 @@ EncoderWheelState::EncoderWheelState() {
 	lastA = LOW;
 }
 
-int16_t EncoderWheelState::getTicks() {
+int32_t EncoderWheelState::getTicks() {
 	return ticks;
 }
 

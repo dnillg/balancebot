@@ -16,9 +16,9 @@ private:
 public:
 	void updateLeftWheel(uint8_t a, uint8_t b);
 	void updateRightWheel(uint8_t a, uint8_t b);
-	int16_t getDistance();
-	int16_t getLeftDistance();
-	int16_t getRightDistance();
+	int32_t getDistance();
+	int32_t getLeftDistance();
+	int32_t getRightDistance();
 	void reset();
 	inline void printDistance() {
 #if LOG_ENCODER

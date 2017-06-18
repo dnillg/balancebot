@@ -10,6 +10,7 @@ class LedMatrixHandler {
 public:
 	static const char IMAGE_SMILEY_HAPPY[8];
 	static const char IMAGE_SMILEY_SAD[8];
+	static const char IMAGE_EYE_OPEN[8];
 private:
 	LedControl ledControl = LedControl(PIN_LEDMATRIX_DIN, PIN_LEDMATRIX_CLK, PIN_LEDMATRIX_CS, 1);
 public:

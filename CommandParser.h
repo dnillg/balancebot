@@ -19,24 +19,31 @@ private:
 	MotorHandler* motorHandler;
 	DisplayHandler* displayHandler;
 public:
-	CommandParser(T* serial, BalanceControl* balanceControl, MotorHandler* motorHandler, DisplayHandler* displayHandler);
+	CommandParser(T* serial, BalanceControl* balanceControl,
+			MotorHandler* motorHandler, DisplayHandler* displayHandler);
 	void readNativeSerialCommands();
 	void parseCommand(char* command);
 private:
-	void parseSetPidCommand(char* cmd);
+	bool isCommandType(const char* cmdChar, const char* refCmdChar,
+			bool dataType);
+	void parseGetTiltPidCommand();
+	void parseSetTiltPidCommand(char* cmd);
+	void parseGetDistPidCommand();
+	void parseSetDistPidCommand(char* cmd);
 	void parseMotorOffCommand();
 	void parseMotorOnCommand();
 	void parseSetMotorMinCommand(char* cmd);
-	void parseGetTiltPidCommand();
 	void parseGetMotorMinCommand();
 	void parseSetMotorOffsetsCommand(char* cmd);
 	void parseSetSetPointsCommand(char* cmd);
 	void parseGetSetPointsCommand();
 	void parseGetMotorOffsetsCommand();
+	void parseControlCommand(char* cmdChr);
 };
 
 template<class T>
-CommandParser<T>::CommandParser(T* serial, BalanceControl* balanceControl, MotorHandler* motorHandler, DisplayHandler* displayHandler) {
+CommandParser<T>::CommandParser(T* serial, BalanceControl* balanceControl,
+		MotorHandler* motorHandler, DisplayHandler* displayHandler) {
 	this->serial = serial;
 	this->balanceControl = balanceControl;
 	this->motorHandler = motorHandler;
@@ -58,29 +65,65 @@ void CommandParser<T>::readNativeSerialCommands() {
 }
 
 template<class T>
-void CommandParser<T>::parseCommand(char* cmdChr) {
-	String command = cmdChr;
-	if (command.startsWith("set_tilt_pid_params")) {
-		parseSetPidCommand(cmdChr);
-	} else if (command.startsWith("motor_off")) {
-		parseMotorOffCommand();
-	} else if (command.startsWith("motor_on")) {
-		parseMotorOnCommand();
-	} else if (command.startsWith("get_tilt_pid_params")) {
-		parseGetTiltPidCommand();
-	} else if (command.startsWith("set_motor_min")) {
-			parseSetMotorMinCommand(cmdChr);
-	} else if (command.startsWith("get_motor_min")) {
-		parseGetMotorMinCommand();
-	} else if (command.startsWith("set_setpoints")) {
-		parseSetSetPointsCommand(cmdChr);
-	} else if (command.startsWith("get_setpoints")) {
-		parseGetSetPointsCommand();
-	} else if (command.startsWith("set_motor_offsets")) {
-		parseSetMotorOffsetsCommand(cmdChr);
-	} else if (command.startsWith("get_motor_offsets")) {
-		parseGetMotorOffsetsCommand();
+bool CommandParser<T>::isCommandType(const char* cmdChar,
+		const char* refCmdChar, bool dataType) {
+	size_t lenpre = strlen(refCmdChar);
+	size_t lenstr = strlen(cmdChar);
+	if (dataType) {
+		return lenstr < (lenpre + 1) ?
+				false :
+				strncmp(refCmdChar, cmdChar, lenpre) == 0
+						&& cmdChar[lenpre] == ';';
+	} else {
+		return lenstr < lenpre ?
+		false :
+									strncmp(refCmdChar, cmdChar, lenpre) == 0;
 	}
+}
+
+template<class T>
+void CommandParser<T>::parseCommand(char* cmdChr) {
+	if (isCommandType(cmdChr, "c", true)) {
+		parseControlCommand(cmdChr);
+	} else if (isCommandType(cmdChr, "set_tilt_pid_params", true)) {
+		parseSetTiltPidCommand(cmdChr);
+	} else if (isCommandType(cmdChr, "get_tilt_pid_params", false)) {
+		parseGetTiltPidCommand();
+	} else if (isCommandType(cmdChr, "set_dist_pid_params", true)) {
+		parseSetDistPidCommand(cmdChr);
+	} else if (isCommandType(cmdChr, "get_dist_pid_params", false)) {
+		parseGetDistPidCommand();
+	} else if (isCommandType(cmdChr, "motor_off", false)) {
+		parseMotorOffCommand();
+	} else if (isCommandType(cmdChr, "motor_on", false)) {
+		parseMotorOnCommand();
+	} else if (isCommandType(cmdChr, "set_motor_min", true)) {
+		parseSetMotorMinCommand(cmdChr);
+	} else if (isCommandType(cmdChr, "get_motor_min", false)) {
+		parseGetMotorMinCommand();
+	} else if (isCommandType(cmdChr, "set_setpoints", true)) {
+		parseSetSetPointsCommand(cmdChr);
+	} else if (isCommandType(cmdChr, "get_setpoints", false)) {
+		parseGetSetPointsCommand();
+	} else if (isCommandType(cmdChr, "set_motor_offsets", true)) {
+		parseSetMotorOffsetsCommand(cmdChr);
+	} else if (isCommandType(cmdChr, "get_motor_offsets", false)) {
+		parseGetMotorOffsetsCommand();
+	} else {
+
+	}
+}
+
+template<class T>
+void CommandParser<T>::parseControlCommand(char* cmd) {
+	char* t;
+	ControlState controlState;
+	strtok_r(cmd, ";", &t);
+	controlState.speed = atoi(t);
+	strtok_r(0, ";", &t);
+	controlState.rotation = atoi(t);
+	strtok_r(0, ";", &t);
+	balanceControl->setControlState(controlState);
 }
 
 template<class T>
@@ -134,7 +177,7 @@ void CommandParser<T>::parseMotorOffCommand() {
 }
 
 template<class T>
-void CommandParser<T>::parseSetPidCommand(char* cmd) {
+void CommandParser<T>::parseSetTiltPidCommand(char* cmd) {
 	char* t;
 	strtok_r(cmd, ";", &t);
 	double p = atof(t);
@@ -146,7 +189,20 @@ void CommandParser<T>::parseSetPidCommand(char* cmd) {
 
 	balanceControl->resetTiltPid(p, i, d);
 	displayHandler->printParams(p, i, d);
-	motorHandler->setEnabled(true);
+}
+
+template<class T>
+void CommandParser<T>::parseSetDistPidCommand(char* cmd) {
+	char* t;
+	strtok_r(cmd, ";", &t);
+	double p = atof(t);
+	strtok_r(0, ";", &t);
+	double i = atof(t);
+	strtok_r(0, ";", &t);
+	double d = atof(t);
+	strtok_r(0, ";", &t);
+
+	balanceControl->resetDistPid(p, i, d);
 }
 
 template<class T>
@@ -168,13 +224,27 @@ template<class T>
 void CommandParser<T>::parseGetTiltPidCommand() {
 	serial->print("tilt_pid_params;");
 	char buf[LOG_FLOAT_BUF_SIZE];
-	dtostrf(balanceControl->getP(), LOG_FLOAT_WIDTH, LOG_FLOAT_PREC, buf);
+	dtostrf(balanceControl->getTiltP(), LOG_FLOAT_WIDTH, LOG_FLOAT_PREC, buf);
 	serial->print(buf);
 	serial->print(";");
-	dtostrf(balanceControl->getI(), LOG_FLOAT_WIDTH, LOG_FLOAT_PREC, buf);
+	dtostrf(balanceControl->getTiltI(), LOG_FLOAT_WIDTH, LOG_FLOAT_PREC, buf);
 	serial->print(buf);
 	serial->print(";");
-	dtostrf(balanceControl->getD(), LOG_FLOAT_WIDTH, LOG_FLOAT_PREC, buf);
+	dtostrf(balanceControl->getTiltD(), LOG_FLOAT_WIDTH, LOG_FLOAT_PREC, buf);
+	serial->println(buf);
+}
+
+template<class T>
+void CommandParser<T>::parseGetDistPidCommand() {
+	serial->print("dist_pid_params;");
+	char buf[LOG_FLOAT_BUF_SIZE];
+	dtostrf(balanceControl->getDistP(), LOG_FLOAT_WIDTH, LOG_FLOAT_PREC, buf);
+	serial->print(buf);
+	serial->print(";");
+	dtostrf(balanceControl->getDistI(), LOG_FLOAT_WIDTH, LOG_FLOAT_PREC, buf);
+	serial->print(buf);
+	serial->print(";");
+	dtostrf(balanceControl->getDistD(), LOG_FLOAT_WIDTH, LOG_FLOAT_PREC, buf);
 	serial->println(buf);
 }
 
