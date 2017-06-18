@@ -2,8 +2,8 @@
 #define CONFIGURATION_H_
 
 // *** LOG *** //
-#define LOG_TILT_PID_IO 1
-#define LOG_DIST_PID_IO 1
+#define LOG_TILT_PID_IO 0
+#define LOG_DIST_PID_IO 0
 #define LOG_ENCODER 0
 #define LOG_EFF_FRQ 1
 
@@ -18,6 +18,7 @@
 #define SJF_EFFECTIVE_FRQ_LOG 100
 #define SJF_EFFECTIVE_FRQ_LCD 500
 #define SJF_STATUS_CHAR_LCD 100
+#define SJF_SPEED_CALC 10
 
 // *** SERIAL *** //
 #define SERIAL_BAUD 115200

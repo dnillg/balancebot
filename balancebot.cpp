@@ -39,6 +39,7 @@ void printEffectiveFrequency();
 void printEffectiveFrequencyLcd();
 void printStatusCharLcd();
 void registerScheduledJobs();
+void calculateSpeed();
 
 void setup() {
 	pinMode(PIN_ENCODER_LEFT_A, INPUT_PULLUP);
@@ -85,6 +86,7 @@ void loop() {
 	context.hwsCommandParser->readNativeSerialCommands();
 	context.frequencyRegulator->waitTick();
 	context.jobScheduler->tick();
+	context.encoderHandler->handleTicks();
 
 	ControlOutput output = context.balanceControl->getControlOutput();
 	context.motorHandler->setLeftSpeed(output.left);
@@ -101,6 +103,8 @@ void registerScheduledJobs() {
 			printEffectiveFrequencyLcd);
 	context.jobScheduler->addJob(SJF_STATUS_CHAR_LCD,
 			printStatusCharLcd);
+	context.jobScheduler->addJob(SJF_SPEED_CALC,
+			calculateSpeed);
 }
 
 void updateLeftWheel() {
@@ -124,5 +128,9 @@ void printEffectiveFrequencyLcd() {
 
 void printStatusCharLcd() {
 	context.displayHandler->printStatusChar();
+}
+
+void calculateSpeed() {
+	context.encoderHandler->calculateSpeed();
 }
 

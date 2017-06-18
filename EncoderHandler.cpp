@@ -9,18 +9,29 @@ void EncoderHandler::updateRightWheel(uint8_t a, uint8_t b) {
 }
 
 int32_t EncoderHandler::getDistance() {
-	return (leftWheelState.getTicks() - rightWheelState.getTicks()) / 2;
-}
-
-int32_t EncoderHandler::getLeftDistance() {
-	return leftWheelState.getTicks();
-}
-
-int32_t EncoderHandler::getRightDistance() {
-	return -rightWheelState.getTicks();
+	return distance;
 }
 
 void EncoderHandler::reset() {
-	leftWheelState = EncoderWheelState();
-	rightWheelState = EncoderWheelState();
+	leftWheelState.reset();
+	rightWheelState.reset();
+	distance = 0;
+	rotation = 0;
+}
+
+void EncoderHandler::calculateSpeed() {
+	speed = tmpSpeed;
+	tmpSpeed = 0;
+	LOGGER.println(speed);
+}
+
+void EncoderHandler::handleTicks() {
+	int8_t leftTicks = leftWheelState.getTicks();
+	int8_t rightTicks = rightWheelState.getTicks();
+	int16_t deltaDistance = leftTicks + rightTicks;
+	distance += deltaDistance;
+	tmpSpeed += deltaDistance;
+	rotation += leftTicks - rightTicks;
+	leftWheelState.reset();
+	rightWheelState.reset();
 }
