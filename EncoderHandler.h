@@ -19,17 +19,14 @@ private:
 public:
 	void updateLeftWheel(uint8_t a, uint8_t b);
 	void updateRightWheel(uint8_t a, uint8_t b);
-	int32_t getDistance();
+	const int32_t& getDistance();
 	void reset();
 	void handleTicks();
 	void calculateSpeed();
+	const int16_t& getSpeed();
 
 	inline void printDistance() {
-#if LOG_ENCODER
-//		LOGGER.print("ecl;");
-//		LOGGER.println(getLeftDistance());
-//		LOGGER.print("ecr;");
-//		LOGGER.println(getRightDistance());
+#if LOG_DISTANCE
 		LOGGER.print("ecd;");
 		LOGGER.println(getDistance());
 #endif

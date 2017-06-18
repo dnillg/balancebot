@@ -8,7 +8,6 @@
 #include "OrientationHandler.h"
 #include "EncoderHandler.h"
 #include "BalanceControl.h"
-#include "DiagnosticsMethods.h"
 #include "FrequencyRegulator.h"
 #include "DisplayHandler.h"
 #include "JobScheduler.h"

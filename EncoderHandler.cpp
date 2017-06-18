@@ -8,8 +8,12 @@ void EncoderHandler::updateRightWheel(uint8_t a, uint8_t b) {
 	rightWheelState.update(a, b);
 }
 
-int32_t EncoderHandler::getDistance() {
+const int32_t& EncoderHandler::getDistance() {
 	return distance;
+}
+
+const int16_t& EncoderHandler::getSpeed() {
+	return speed;
 }
 
 void EncoderHandler::reset() {
@@ -22,7 +26,6 @@ void EncoderHandler::reset() {
 void EncoderHandler::calculateSpeed() {
 	speed = tmpSpeed;
 	tmpSpeed = 0;
-	LOGGER.println(speed);
 }
 
 void EncoderHandler::handleTicks() {

@@ -17,8 +17,10 @@ private:
 	EncoderHandler* encoderHandler;
 	PidData tiltPidData;
 	PidData distPidData;
+	PidData speedPidData;
 	PID* tiltPid = 0;
 	PID* distPid = 0;
+	PID* speedPid = 0;
 	int16_t balanceSetPoint = TILT_PID_BALANCE_SETPOINT;
 	int16_t directionSetPoint = TILT_PID_FORWARD_SETPOINT;
 	ControlState controlState;
@@ -41,7 +43,18 @@ private:
 #endif
 	}
 
+	inline void printSpeedIO() {
+#if LOG_SPEED_PID_IO
+		LOGGER.print("spi;");
+		LOGGER.println(speedPidData.input);
+		LOGGER.print("spo;");
+		LOGGER.println(speedPidData.output);
+#endif
+	}
+
 	double calculateTiltPidSetPoint();
+	double calculateStallSpeedPidSetPoint();
+	double calculateDirectionSpeedSetPoint();
 
 public:
 	BalanceControl(OrientationHandler* orientationHandler,
@@ -49,12 +62,16 @@ public:
 	ControlOutput getControlOutput();
 	void resetTiltPid(const double& p, const double& i, const double& d);
 	void resetDistPid(const double& p, const double& i, const double& d);
+	void resetSpeedPid(const double& p, const double& i, const double& d);
 	double getTiltP() const;
 	double getTiltI() const;
 	double getTiltD() const;
 	double getDistP() const;
 	double getDistI() const;
 	double getDistD() const;
+	double getSpeedP() const;
+	double getSpeedI() const;
+	double getSpeedD() const;
 	int16_t getBalanceSetPoint() const;
 	void setBalanceSetPoint(int16_t balanceSetPoint);
 	int16_t getDirectionSetPoint() const;
