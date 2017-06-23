@@ -4,8 +4,8 @@
 // *** LOG *** //
 #define LOG_TILT_PID_IO 0
 #define LOG_DIST_PID_IO 0
-#define LOG_SPEED_PID_IO 1
-#define LOG_DISTANCE 0
+#define LOG_SPEED_PID_IO 0
+#define LOG_DISTANCE 1
 #define LOG_EFF_FRQ 1
 
 #define LOG_FLOAT_WIDTH 3
@@ -41,14 +41,15 @@
 #define LED_MATRIX_LIGHT_INTENSITY 15
 
 // *** MOTORS *** //
-#define MOTOR_MIN 50
+#define ENCODER_ROUND_TICKS 480
+#define MOTOR_MIN 44
 #define MOTOR_LEFT_OFFSET 2
 #define MOTOR_RIGHT_OFFSET 0
 
 // *** TILT PID *** //
-#define TILT_PID_P 1.25
-#define TILT_PID_I 0.7
-#define TILT_PID_D 0.05
+#define TILT_PID_P 1.33
+#define TILT_PID_I 1
+#define TILT_PID_D 0.098
 #define TILT_PID_BALANCE_SETPOINT 0
 #define TILT_PID_FORWARD_SETPOINT 50
 #define TILT_PID_BACKWARD_SETPOINT -50

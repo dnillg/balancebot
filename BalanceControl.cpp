@@ -31,7 +31,7 @@ double BalanceControl::calculateTiltPidSetPoint() {
 		speedPidData.setPoint = calculateDirectionSpeedSetPoint();
 	}
 	speedPid->Compute();
-	return speedPidData.output + balanceSetPoint;
+	return 0 + balanceSetPoint;
 }
 
 double BalanceControl::calculateDirectionSpeedSetPoint() {

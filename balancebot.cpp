@@ -64,7 +64,7 @@ void setup() {
 	context.motorHandler = new MotorHandler(MOTOR_MIN, MOTOR_LEFT_OFFSET,
 	MOTOR_RIGHT_OFFSET);
 	context.orientationHandler = new OrientationHandler();
-	context.encoderHandler = new EncoderHandler();
+	context.encoderHandler = new EncoderHandler(context.orientationHandler);
 	context.balanceControl = new BalanceControl(context.orientationHandler,
 			context.encoderHandler);
 	context.frequencyRegulator = new FrequencyRegulator(NOMINAL_FRQ);
